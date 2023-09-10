@@ -5,10 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static per.duyd.interview.pts.util.DateTimeUtil.UTC_ZONE_ID;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,9 +30,6 @@ class TreasuryClientTest {
   @InjectMocks
   private TreasuryClient treasuryClient;
 
-  private final String sixMonthsAgoDate = LocalDate.now(UTC_ZONE_ID).minusMonths(6)
-      .format(DateTimeFormatter.ISO_LOCAL_DATE);
-
   private ResponseEntity<ExchangeRateResponse> responseEntity;
   private ArgumentCaptor<String> upstreamUrlCaptor;
   private static final String TEST_CURRENCY = "Country-Currency";
@@ -50,6 +45,7 @@ class TreasuryClientTest {
   @Test
   void shouldGetLatestExchangeNotOlderThan6Months() {
     //Given
+    LocalDate transactionDate = LocalDate.now();
     ExchangeRateDto expectedExchangeRateDto = ExchangeRateDto.builder().build();
     ExchangeRateResponse exchangeRateResponse = ExchangeRateResponse.builder()
         .exchangeRateDtos(List.of(expectedExchangeRateDto, ExchangeRateDto.builder().build(),
@@ -58,15 +54,17 @@ class TreasuryClientTest {
     when(responseEntity.getBody()).thenReturn(exchangeRateResponse);
 
     //When
-    ExchangeRateDto actualExchangeRateDto = treasuryClient.getLatestExchangeRate(TEST_CURRENCY);
+    ExchangeRateDto actualExchangeRateDto = treasuryClient.getLatestExchangeRate(TEST_CURRENCY,
+        transactionDate);
 
     //Then
     assertThat(actualExchangeRateDto).isEqualTo(expectedExchangeRateDto);
     assertThat(upstreamUrlCaptor.getValue()).isEqualTo(String.format(
-        "http://localhost:8090/v1/accounting/od/rates_of_exchange?fields=record_date,"
+        "http://localhost:8090/v1/accounting/od/rates_of_exchange?fields=effective_date,"
             + "exchange_rate,country_currency_desc&filter=country_currency_desc:eq:Country"
-            + "-Currency,record_date:gte:%s&sort=-record_date&page[number]=1&page[size]=1",
-        sixMonthsAgoDate));
+            + "-Currency,effective_date:gte:%s,effective_date:lte:%s"
+            + "&sort=-effective_date&page[number]=1&page[size]=1",
+        transactionDate.minusMonths(6), transactionDate));
   }
 
   @Test
@@ -78,6 +76,6 @@ class TreasuryClientTest {
 
     //When & Then
     assertThrows(DataNotFoundException.class,
-        () -> treasuryClient.getLatestExchangeRate(TEST_CURRENCY));
+        () -> treasuryClient.getLatestExchangeRate(TEST_CURRENCY, LocalDate.now()));
   }
 }

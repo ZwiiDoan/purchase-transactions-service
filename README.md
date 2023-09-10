@@ -32,14 +32,14 @@
 1. Dates in Treasury Reporting Rates of Exchange API are in UTC timezone
 2. Purchase Transaction dates are also in UTC timezone.
 3. Requirement #3 prevents Docker Engine Installation and Usage but not Java 17 Installation and Embedded/In-memory
-   database (H2) anc cache (Redis) which requires no extra installation.
+   database (H2) which requires no extra installation.
 
 ### Solution
 
 The Application is built as a Web Service that exposes 2 endpoints to store and retrieve a single Purchase Transaction.
 For more information about the endpoints, please open [pts-swagger.yml](pts-swagger.yml). "Store a Purchase Transaction"
-endpoint is straight-forward: the incoming Purchase Transaction is validated and assigned
-a UUID before getting persisted into Database. A valid Purchase Transaction must satisfy:
+endpoint is straight-forward: the incoming Purchase Transaction is validated and assigned a UUID as `Transaction Id`
+before getting persisted into Database. A valid Purchase Transaction must satisfy:
 
 * Description is optional and cannot exceed 50 characters
 * Transaction date is required and must not be in future
@@ -50,21 +50,21 @@ transaction" endpoint.
 
 ![Purchase Tranasction Service - Solution.PNG](diagrams%2FPurchase%20Tranasction%20Service%20-%20Solution.PNG)
 
-* The application uses a cache to store exchange rate fetched from Treasury Reporting Rates of Exchange API so that it
-  will not need to make the downstream call for every user request. Exchange rate is cached by "Country-Currency" (
-  supported by the [Treasury
-  Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange))
+* A Purchase Transaction GET request will require a `Transaction Id` and `Currency` (`country_currency_desc` supported
+  by [Treasury Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange))
+* The application will store the exchange rate fetched from the API into Database so that it
+  will not need to make the downstream call for every user request.
 * When sending requests to Treasury Reporting Rates of Exchange API, the application always asks for the
   latest exchange rate that is not older than 6 months from current time to satisfy Requirement #2. This is achieved by
   using the API query
-  params: `&filter=country_currency_desc:eq:{Requested-Country-Currency},record_date:gte:{Current-Date-6-Months-Ago}&sort=-record_date&page[number]=1&page[size]=1`.
+  params: `&filter=country_currency_desc:eq:{Requested-Country-Currency},effective_date:gte:{Purchase-Date-6-Months-Ago},effective_date:lte:{Purchase-Date}&sort=-record_date&page[number]=1&page[size]=1`.
   This approach minimises the implementation required and the amount of data needs to be fetched.
 * The application utilises [Resilience4j](https://resilience4j.readme.io/docs/getting-started-3) to implement best
   practice patterns when interacting with downstream services such as: circuit-breaker, rate-limiting (throttling),
   bulkhead and retry
-* For local development and test, the repo uses Embedded/In-memory database (H2) anc cache (Redis) which requires no
+* For local development and test, the repo uses Embedded/In-memory database (H2) which requires no
   extra installation. In remote and production environments, these dependencies are expected to be production-grade
-  systems such as AWS RDS, AWS ElasticCache. The application is also expected to be deployed as multiple Docker
+  systems such as AWS RDS. The application is also expected to be deployed as multiple Docker
   containers/computing instances in a High Availability and Secured Infrastructure with production-grade systems such as
   AWS ECS exposed via AWS API Gateway.
 
@@ -98,7 +98,7 @@ Execute from repo's root directory
 ```
 
 * In Local Development (default) and Local Test environments, the application integrates with embedded/in-memory H2
-  Database and Redis Cache.
+  Database.
 * For demo purpose, it also connects to the real [Treasury
   Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange)
   in Local Development environment
@@ -131,3 +131,5 @@ curl --location 'http://localhost:8080/purchase-transaction/{transaction-id}?cur
    standards or business requirements.
 2. More robust observability solutions can be integrated such as distributed tracing, logging, metrics
    with [Spring Boot 3 Observability](https://spring.io/blog/2022/10/12/observability-with-spring-boot-3).
+3. NoSQL Database can be used instead of Relational Database for better scaling since the data model is relatively
+   simple and there is no requirement for complex queries.

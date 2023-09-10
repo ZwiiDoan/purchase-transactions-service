@@ -77,8 +77,7 @@ class PurchaseTransactionServiceTest {
 
     ExchangeRate exchangeRate = ExchangeRate.builder()
         .exchangeRate(1.2)
-        .expirationInSeconds(10000L)
-        .recordDate(TRANSACTION_DATE)
+        .effectiveDate(TRANSACTION_DATE)
         .currency(TEST_CURRENCY)
         .build();
     when(cachingExchangeRateService.getExchangeRate(TEST_CURRENCY,

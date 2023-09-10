@@ -8,13 +8,11 @@ public class ExchangeRateMapper {
     //For Jacoco Coverage
   }
 
-  public static ExchangeRate fromExchangeRateDto(ExchangeRateDto exchangeRateDto,
-                                                 long expirationInSeconds) {
+  public static ExchangeRate fromExchangeRateDto(ExchangeRateDto exchangeRateDto) {
     return ExchangeRate.builder()
         .currency(exchangeRateDto.getCurrency())
         .exchangeRate(exchangeRateDto.getExchangeRate())
-        .recordDate(exchangeRateDto.getRecordDate())
-        .expirationInSeconds(expirationInSeconds)
+        .effectiveDate(exchangeRateDto.getEffectiveDate())
         .build();
   }
 }

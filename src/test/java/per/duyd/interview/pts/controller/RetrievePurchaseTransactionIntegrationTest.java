@@ -6,12 +6,9 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static per.duyd.interview.pts.util.DateTimeUtil.UTC_ZONE_ID;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -36,7 +33,7 @@ public class RetrievePurchaseTransactionIntegrationTest
   void shouldRetrievePurchaseTransactionSuccessfully() throws Exception {
     //Given
     treasuryWiremock.stubFor(com.github.tomakehurst.wiremock.client.WireMock.get(
-            urlEqualTo(getTreasuryExchangeRateUrl("Australia-Dollar")))
+            urlEqualTo(getTreasuryExchangeRateUrl()))
         .willReturn(aResponse().withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
             .withStatus(200).withBody(
                 readFileToJsonString("/json/treasury/exchange-rate_200-response.json"))));
@@ -98,7 +95,7 @@ public class RetrievePurchaseTransactionIntegrationTest
       String responseFile) throws Exception {
     //Given
     treasuryWiremock.stubFor(com.github.tomakehurst.wiremock.client.WireMock.get(
-            urlEqualTo(getTreasuryExchangeRateUrl("Australia-Dollar")))
+            urlEqualTo(getTreasuryExchangeRateUrl()))
         .willReturn(aResponse().withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
             .withStatus(treasuryResponseStatus)
             .withBody(readFileToJsonString(treasuryResponseFile))));
@@ -133,22 +130,16 @@ public class RetrievePurchaseTransactionIntegrationTest
             "/json/pts/response/response_treasury-404.json"),
         Arguments.of("/json/treasury/exchange-rate_500-response.json", 500, 500,
             "/json/pts/response/response_treasury-500.json"),
-        Arguments.of("/json/treasury/exchange-rate_not-applicable-response.json", 200, 404,
-            "/json/pts/response/response_treasury-exchange-rate-not-applicable.json"),
         Arguments.of("/json/treasury/exchange-rate_empty-response.json", 200, 404,
             "/json/pts/response/response_treasury-exchange-rate-empty.json")
     );
   }
 
-  private String getTreasuryExchangeRateUrl(String currency) {
-    return String.format("/v1/accounting/od/rates_of_exchange"
-        + "?fields=record_date,exchange_rate,country_currency_desc"
-        + "&filter=country_currency_desc:eq:%s,"
-        + "record_date:gte:%s&sort=-record_date", currency, getMinRecordDate())
+  private String getTreasuryExchangeRateUrl() {
+    return "/v1/accounting/od/rates_of_exchange"
+        + "?fields=effective_date,exchange_rate,country_currency_desc"
+        + "&filter=country_currency_desc:eq:Australia-Dollar,"
+        + "effective_date:gte:2023-03-01,effective_date:lte:2023-09-01&sort=-effective_date"
         + "&page%5Bnumber%5D=1&page%5Bsize%5D=1";
-  }
-
-  private String getMinRecordDate() {
-    return LocalDate.now(UTC_ZONE_ID).minusMonths(6).format(DateTimeFormatter.ISO_LOCAL_DATE);
   }
 }

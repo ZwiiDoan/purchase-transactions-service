@@ -13,10 +13,6 @@ spring:
   flyway:
     enabled: false #TODO: run flyway migration in a separated CD pipeline
     out-of-order: false
-  data:
-    redis:
-      host: ${ENV.CACHE.HOST}
-      port: ${ENV.CACHE.PORT}
 
 services:
   treasury:

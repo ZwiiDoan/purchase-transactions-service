@@ -68,7 +68,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PurchaseTransactionErrorResponse'
         '429':
-          description: Too many requests - rate limited from Upstream
+          description: Too many requests - rate limited from Downstream
           content:
             application/json:
               schema:
@@ -98,11 +98,11 @@ components:
           maxLength: 50
         transactionDate:
           type: string
-          description: a valid date in UTC timezone
+          description: a valid date in UTC timezone, cannot be in future
           example: "2023-09-06"
         purchaseAmount:
           type: number
-          description: purchase amount in USD
+          description: purchase amount in USD, must be positive
           example: 12364.23754
     PurchaseTransactionResponse:
       type: object
@@ -112,7 +112,7 @@ components:
           maxLength: 50
         transactionDate:
           type: string
-          description: a valid date in UTC timezone
+          description: a valid date in UTC timezone, cannot be in future
           example: "2023-09-06"
         purchaseAmount:
           type: number
@@ -146,7 +146,7 @@ components:
           example: 0.63
         convertedAmount:
           type: number
-          description: purchase amount in the specified currency's exchange rate for the date of the purchase
+          description: purchase amount in the specified currency's exchange rate for the date of the purchase, rounded to nearest cent
           example: 16942.12
     PurchaseTransactionErrorResponse:
       type: object
@@ -155,4 +155,4 @@ components:
           type: string
         errorCode:
           type: string
-          enum: [ INVALID_REQUEST, PURCHASE_TRANSACTION_NOT_FOUND, EXCHANGE_RATE_NOT_FOUND, UPSTREAM_RATE_LIMITED, INTERNAL_SERVER_ERROR ]
+          enum: [ INVALID_REQUEST, PURCHASE_TRANSACTION_NOT_FOUND, EXCHANGE_RATE_NOT_FOUND, DOWNSTREAM_ERROR, INTERNAL_SERVER_ERROR ]

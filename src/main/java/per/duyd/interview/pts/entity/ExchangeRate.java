@@ -1,26 +1,28 @@
 package per.duyd.interview.pts.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.TimeToLive;
+import lombok.NoArgsConstructor;
 
-@RedisHash("ExchangeRate")
 @Data
+@Entity
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@IdClass(ExchangeRateId.class)
 public class ExchangeRate {
   @Id
   private String currency;
 
-  @NotNull
-  private LocalDate recordDate;
+  @Id
+  private LocalDate effectiveDate;
 
   @NotNull
   private Double exchangeRate;
-
-  @TimeToLive
-  private Long expirationInSeconds;
 }

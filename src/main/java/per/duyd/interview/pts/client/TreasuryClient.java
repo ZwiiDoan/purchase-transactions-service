@@ -1,7 +1,6 @@
 package per.duyd.interview.pts.client;
 
 import static per.duyd.interview.pts.exception.DataNotFoundException.EXCHANGE_RATE_NOT_FOUND_EXCEPTION;
-import static per.duyd.interview.pts.util.DateTimeUtil.UTC_ZONE_ID;
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -28,9 +27,9 @@ public class TreasuryClient {
 
   public static final String TREASURY_EXCHANGE_RATE_API_NAME = "TreasuryExchangeRate";
   private static final String LATEST_EXCHANGE_RATE_QUERY_TEMPLATE =
-      "?fields=record_date,exchange_rate,country_currency_desc"
-          + "&filter=country_currency_desc:eq:%s,record_date:gte:%s"
-          + "&sort=-record_date"
+      "?fields=effective_date,exchange_rate,country_currency_desc"
+          + "&filter=country_currency_desc:eq:%s,effective_date:gte:%s,effective_date:lte:%s"
+          + "&sort=-effective_date"
           + "&page[number]=1&page[size]=1";
 
   private final RestTemplate treasuryRestTemplate;
@@ -49,9 +48,10 @@ public class TreasuryClient {
   @Bulkhead(name = TREASURY_EXCHANGE_RATE_API_NAME)
   @Retry(name = TREASURY_EXCHANGE_RATE_API_NAME)
   @TrackDownstreamInvocation(downstreamName = TREASURY_EXCHANGE_RATE_API_NAME, endpoint = "/v1/accounting/od/rates_of_exchange")
-  public @NotNull ExchangeRateDto getLatestExchangeRate(@NotNull String currency) {
+  public @NotNull ExchangeRateDto getLatestExchangeRate(@NotNull String currency,
+                                                        LocalDate transactionDate) {
     ResponseEntity<ExchangeRateResponse> responseEntity = treasuryRestTemplate.getForEntity(
-        baseUrl + exchangeRateEndpoint + getLatestExchangeRateQuery(currency),
+        baseUrl + exchangeRateEndpoint + getLatestExchangeRateQuery(currency, transactionDate),
         ExchangeRateResponse.class
     );
 
@@ -61,9 +61,10 @@ public class TreasuryClient {
         .orElseThrow(() -> EXCHANGE_RATE_NOT_FOUND_EXCEPTION);
   }
 
-  private String getLatestExchangeRateQuery(@NotNull String currency) {
-    return String.format(LATEST_EXCHANGE_RATE_QUERY_TEMPLATE, currency,
-        LocalDate.now(UTC_ZONE_ID).minusMonths(validMonths)
-            .format(DateTimeFormatter.ISO_LOCAL_DATE));
+  private String getLatestExchangeRateQuery(@NotNull String currency, LocalDate transactionDate) {
+    return String.format(LATEST_EXCHANGE_RATE_QUERY_TEMPLATE,
+        currency,
+        transactionDate.minusMonths(validMonths).format(DateTimeFormatter.ISO_LOCAL_DATE),
+        transactionDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
   }
 }

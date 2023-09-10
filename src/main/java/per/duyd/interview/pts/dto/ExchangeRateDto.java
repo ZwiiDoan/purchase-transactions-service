@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExchangeRateDto {
-  @JsonProperty("record_date")
+  @JsonProperty("effective_date")
   @NotNull
-  private LocalDate recordDate;
+  private LocalDate effectiveDate;
 
   @JsonProperty("country_currency_desc")
   @NotNull
