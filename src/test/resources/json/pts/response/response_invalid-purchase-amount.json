@@ -1,0 +1,4 @@
+{
+  "errorCode": "INVALID_REQUEST",
+  "errorMessage": "Cannot deserialize value of type `java.math.BigDecimal` from String \"abc\": not a valid representation\n at [Source: (org.springframework.util.StreamUtils$NonClosingInputStream); line: 4, column: 21] (through reference chain: per.duyd.interview.pts.dto.PurchaseTransactionRequest[\"purchaseAmount\"])"
+}

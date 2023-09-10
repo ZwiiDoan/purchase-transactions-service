@@ -1,0 +1,73 @@
+spring:
+  datasource:
+    username: test
+    password: test
+    url: jdbc:h2:mem:test
+    driver-class-name: org.h2.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 8
+      connection-test-query: select 1
+      connection-init-sql: select 1
+  flyway:
+    enabled: true
+    out-of-order: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+services:
+  treasury:
+    baseUrl: https://api.fiscaldata.treasury.gov/services/api/fiscal_service
+    endpoint: /v1/accounting/od/rates_of_exchange
+    connectTimeoutMs: 1000
+    readTimeoutMs: 10000
+
+application:
+  exchangeRate:
+    validMonths: 6
+
+logging:
+  pattern:
+    level: "%5p [correlationId=%X{correlationId:-}]"
+  level:
+    per.duyd: DEBUG
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      TreasuryExchangeRate:
+        registerHealthIndicator: true
+        slidingWindowSize: 100
+        waitDurationInOpenState: 50s
+        failureRateThreshold: 50
+  retry:
+    instances:
+      TreasuryExchangeRate:
+        max-attempts: 3
+        retry-exceptions:
+          - per.duyd.interview.pts.exception.DownstreamServerErrorResponseException
+        ignore-exceptions:
+          - per.duyd.interview.pts.exception.DataNotFoundException
+          - per.duyd.interview.pts.exception.DownstreamClientErrorResponseException
+  bulkhead:
+    instances:
+      TreasuryExchangeRate:
+        maxConcurrentCalls: 10
+  thread-pool-bulkhead:
+    instances:
+      TreasuryExchangeRate:
+        maxThreadPoolSize: 10
+        coreThreadPoolSize: 2
+        queueCapacity: 10
+  ratelimiter:
+    instances:
+      TreasuryExchangeRate:
+        limitForPeriod: 10
+        limitRefreshPeriod: 1s
+        registerHealthIndicator: true

@@ -1,0 +1,31 @@
+{
+  "data": [
+  ],
+  "meta": {
+    "count": 1,
+    "labels": {
+      "record_date": "Record Date",
+      "exchange_rate": "Exchange Rate",
+      "country_currency_desc": "Country - Currency Description"
+    },
+    "dataTypes": {
+      "record_date": "DATE",
+      "exchange_rate": "NUMBER",
+      "country_currency_desc": "STRING"
+    },
+    "dataFormats": {
+      "record_date": "YYYY-MM-DD",
+      "exchange_rate": "10.2",
+      "country_currency_desc": "String"
+    },
+    "total-count": 2,
+    "total-pages": 2
+  },
+  "links": {
+    "self": "&page%5Bnumber%5D=1&page%5Bsize%5D=1",
+    "first": "&page%5Bnumber%5D=1&page%5Bsize%5D=1",
+    "prev": null,
+    "next": "&page%5Bnumber%5D=2&page%5Bsize%5D=1",
+    "last": "&page%5Bnumber%5D=2&page%5Bsize%5D=1"
+  }
+}

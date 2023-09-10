@@ -1,0 +1,4 @@
+{
+  "errorCode": "PURCHASE_TRANSACTION_NOT_FOUND",
+  "errorMessage": "Purchase transaction does not exist"
+}

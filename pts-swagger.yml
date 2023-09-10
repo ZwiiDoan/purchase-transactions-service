@@ -1,0 +1,158 @@
+openapi: 3.0.3
+info:
+  title: Purchase Transaction Service - OpenAPI 3.0
+  version: 1.0.0
+paths:
+  /purchase-transaction:
+    post:
+      summary: Add a new purchase transaction
+      description: Add a new purchase transaction
+      operationId: addPurchaseTransaction
+      requestBody:
+        description: Create a new purchase transaction
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseTransactionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseTransactionResponse'
+        '400':
+          description: Invalid request supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseTransactionErrorResponse'
+        '500':
+          description: The service failed to process a valid request due to some internal errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseTransactionErrorResponse'
+  /purchase-transaction/{transactionId}:
+    get:
+      summary: Find purchase transaction by ID
+      description: Returns a single purchase transaction
+      operationId: getPurchaseTransactionById
+      parameters:
+        - name: transactionId
+          in: path
+          description: ID of transaction to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: currency
+          in: query
+          schema:
+            type: string
+          description: The country currency description supported by the [Treasury Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange)
+          example: Australia-Dollar
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConvertedTransactionResponse'
+        '400':
+          description: Invalid request supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseTransactionErrorResponse'
+        '429':
+          description: Too many requests - rate limited from Upstream
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseTransactionErrorResponse'
+        '404':
+          description: Purchase transaction not found or no valid exchange rate found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseTransactionErrorResponse'
+        '500':
+          description: The service failed to process a valid request due to some internal errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseTransactionErrorResponse'
+components:
+  schemas:
+    PurchaseTransactionRequest:
+      type: object
+      required:
+        - transactionDate
+        - purchaseAmount
+      properties:
+        description:
+          type: string
+          maxLength: 50
+        transactionDate:
+          type: string
+          description: a valid date in UTC timezone
+          example: "2023-09-06"
+        purchaseAmount:
+          type: number
+          description: purchase amount in USD
+          example: 12364.23754
+    PurchaseTransactionResponse:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 50
+        transactionDate:
+          type: string
+          description: a valid date in UTC timezone
+          example: "2023-09-06"
+        purchaseAmount:
+          type: number
+          description: purchase amount in USD
+          example: 12364.23754
+        transactionId:
+          type: string
+          description: UUID of the transaction
+          example: 0b716ded-1ac0-4f39-adc0-b450dcf0230c
+          format: uuid
+    ConvertedTransactionResponse:
+      type: object
+      properties:
+        description:
+          type: string
+        transactionDate:
+          type: string
+          description: a valid date in UTC timezone
+          example: "2023-09-06"
+        purchaseAmount:
+          type: number
+          description: purchase amount in USD rounded to nearest cent
+          example: 12364.24
+        transactionId:
+          type: string
+          description: UUID of the transaction
+          example: "de56afa4-2c61-48c6-8aab-324510fba1a0"
+        exchangeRate:
+          type: number
+          description: exchange rate used
+          example: 0.63
+        convertedAmount:
+          type: number
+          description: purchase amount in the specified currency's exchange rate for the date of the purchase
+          example: 16942.12
+    PurchaseTransactionErrorResponse:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+        errorCode:
+          type: string
+          enum: [ INVALID_REQUEST, PURCHASE_TRANSACTION_NOT_FOUND, EXCHANGE_RATE_NOT_FOUND, UPSTREAM_RATE_LIMITED, INTERNAL_SERVER_ERROR ]

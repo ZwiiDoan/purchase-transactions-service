@@ -1,0 +1,9 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6370
+
+services:
+  treasury:
+    baseUrl: http://localhost:8090

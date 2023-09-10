@@ -1,0 +1,4 @@
+{
+  "errorCode": "DOWNSTREAM_ERROR",
+  "errorMessage": "Request failed due to rate limiting"
+}

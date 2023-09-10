@@ -1,0 +1,4 @@
+{
+  "errorCode": "EXCHANGE_RATE_NOT_FOUND",
+  "errorMessage": "No valid exchange rate found for specified currency"
+}

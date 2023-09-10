@@ -1,0 +1,4 @@
+{
+  "error": "Too Many Requests",
+  "message": "Request failed due to rate limiting"
+}

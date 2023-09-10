@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    username: ${ENV.DATABASE.USERNAME} #TODO: inject systems integration test (SIT) credentials and configs via environment variables
+    password: ${ENV.DATABASE.PASSWORD}
+    url: ${ENV.DATABASE.URL}
+    driver-class-name: org.h2.Driver #TODO: use appropriate driver for systems integration test (SIT) database
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari: #TODO: fine tune DB connection pool for systems integration test (SIT) database
+      minimum-idle: 8
+      maximum-pool-size: 32
+      connection-test-query: select 1
+      connection-init-sql: select 1
+  flyway:
+    enabled: false #TODO: run flyway migration in a separated CD pipeline
+    out-of-order: false
+  data:
+    redis:
+      host: ${ENV.CACHE.HOST}
+      port: ${ENV.CACHE.PORT}
+
+services:
+  treasury:
+    baseUrl: ${ENV.SERVICE.TREASURY.BASEURL}

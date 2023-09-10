@@ -1,0 +1,9 @@
+package per.duyd.interview.pts.enums;
+
+public enum ErrorCode {
+  INVALID_REQUEST,
+  PURCHASE_TRANSACTION_NOT_FOUND,
+  EXCHANGE_RATE_NOT_FOUND,
+  DOWNSTREAM_ERROR,
+  INTERNAL_SERVER_ERROR
+}
