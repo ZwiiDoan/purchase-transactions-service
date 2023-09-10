@@ -31,10 +31,7 @@
 
 1. Dates in Treasury Reporting Rates of Exchange API are in UTC timezone
 2. Purchase Transaction dates are also in UTC timezone.
-3. The application requires a transaction id and "Country-Currency" (supported by the [Treasury
-   Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange))
-   to retrieve a Purchase Transaction in a Specified Country’s Currency
-4. Requirement #3 prevents Docker Engine Installation and Usage but not Java 17 Installation and Embedded/In-memory
+3. Requirement #3 prevents Docker Engine Installation and Usage but not Java 17 Installation and Embedded/In-memory
    database (H2) anc cache (Redis) which requires no extra installation.
 
 ### Solution
@@ -42,7 +39,13 @@
 The Application is built as a Web Service that exposes 2 endpoints to store and retrieve a single Purchase Transaction.
 For more information about the endpoints, please open [pts-swagger.yml](pts-swagger.yml). "Store a Purchase Transaction"
 endpoint is straight-forward: the incoming Purchase Transaction is validated and assigned
-a UUID before getting persisted into Database. The diagram below depicts solution for the "Retrieve a stored purchase
+a UUID before getting persisted into Database. A valid Purchase Transaction must satisfy:
+
+* Description is optional and cannot exceed 50 characters
+* Transaction date is required and must not be in future
+* Purchase amount is required and must be greater than 0
+
+The diagram below depicts solution for the "Retrieve a stored purchase
 transaction" endpoint.
 
 ![Purchase Tranasction Service - Solution.PNG](diagrams%2FPurchase%20Tranasction%20Service%20-%20Solution.PNG)

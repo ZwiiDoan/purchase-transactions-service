@@ -1,4 +1,4 @@
 {
   "errorCode": "INVALID_REQUEST",
-  "errorMessage": "transactionDate is not a valid date"
+  "errorMessage": "transactionDate must be a date in the past or in the present"
 }

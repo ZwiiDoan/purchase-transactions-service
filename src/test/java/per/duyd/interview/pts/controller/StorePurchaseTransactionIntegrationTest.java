@@ -40,14 +40,16 @@ class StorePurchaseTransactionIntegrationTest extends BasePurchaseTransactionInt
 
   public static Stream<Arguments> shouldReturnExpectedErrorResponsesParams() {
     return Stream.of(
-        Arguments.of("/json/pts/request/request_invalid-transaction-date.json", 400,
-            "/json/pts/response/response_invalid-transaction-date.json"),
+        Arguments.of("/json/pts/request/request_malformed-transaction-date.json", 400,
+            "/json/pts/response/response_malformed-transaction-date.json"),
         Arguments.of("/json/pts/request/request_future-transaction-date.json", 400,
             "/json/pts/response/response_future-transaction-date.json"),
         Arguments.of("/json/pts/request/request_invalid-transaction-description.json", 400,
             "/json/pts/response/response_invalid-transaction-description.json"),
-        Arguments.of("/json/pts/request/request_invalid-purchase-amount.json", 400,
-            "/json/pts/response/response_invalid-purchase-amount.json"),
+        Arguments.of("/json/pts/request/request_malformed-purchase-amount.json", 400,
+            "/json/pts/response/response_malformed-purchase-amount.json"),
+        Arguments.of("/json/pts/request/request_non-positive-purchase-amount.json", 400,
+            "/json/pts/response/response_non-positive-purchase-amount.json"),
         Arguments.of("/json/pts/request/request_missing-required-fields.json", 400,
             "/json/pts/response/response_missing-required-fields.json")
     );

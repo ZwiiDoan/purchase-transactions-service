@@ -1,6 +1,8 @@
 package per.duyd.interview.pts.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -8,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import per.duyd.interview.pts.validation.TransactionDate;
 
 @Data
 @Builder
@@ -19,9 +20,10 @@ public class PurchaseTransactionRequest {
   private String description;
 
   @NotNull
-  @TransactionDate
+  @PastOrPresent
   private LocalDate transactionDate;
 
   @NotNull
+  @Positive
   private BigDecimal purchaseAmount;
 }
