@@ -5,6 +5,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'com.github.spotbugs' version "6.0.0-beta.3"
+    id "org.owasp.dependencycheck" version "8.4.0"
 }
 
 group = 'per.duyd.interview'
@@ -29,24 +30,24 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation("org.apache.commons:commons-lang3:${commonLang3Version}")
     implementation 'org.flywaydb:flyway-core'
     implementation "io.github.resilience4j:resilience4j-spring-boot3:${resilience4jVersion}"
-    implementation("it.ozimov:embedded-redis:${embeddedRedisVersion}") {
-        exclude group: 'org.slf4j', module: 'slf4j-simple'//conflict with Spring logback
-    }
-    implementation "com.google.guava:guava:${guavaVersion}"//fix embedded-redis CVE
-    implementation "commons-io:commons-io:${commonsIoVersion}"//fix embedded-redis CVE
-
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+//    implementation 'io.zipkin.reporter2:zipkin-reporter-brave' //Require a Zipkin Server
+//    implementation 'com.github.loki4j:loki-logback-appender' //Require a Zipkin Server
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation("org.wiremock:wiremock:${wiremockVersion}")
+    testImplementation("org.wiremock:wiremock:${wiremockVersion}") {
+        exclude group: 'commons-fileupload', module: 'commons-fileupload' //CVE fix
+        exclude group: 'org.eclipse.jetty', module: 'jetty-xml' //CVE fix
+    }
 
     spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.12.0'
 }

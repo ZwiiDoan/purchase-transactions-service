@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TrackDownstreamInvocation {
+public @interface TrackDownstreamCall {
   String downstreamName();
 
   String endpoint();

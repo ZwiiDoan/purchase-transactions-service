@@ -14,7 +14,7 @@ public class BasePurchaseTransactionIntegrationTest extends BaseIntegrationTest 
   @Autowired
   protected ObjectMapper objectMapper;
 
-  public static final String PURCHASE_TRANSACTION_PATH = "/purchase-transaction";
+  public static final String PURCHASE_TRANSACTION_PATH = "/v1/purchase-transaction";
 
   public PurchaseTransactionResponse postPurchaseTransaction(String requestFile)
       throws Exception {

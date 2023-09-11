@@ -1,5 +1,6 @@
 package per.duyd.interview.pts.controller;
 
+import io.micrometer.observation.annotation.Observed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.websocket.server.PathParam;
@@ -21,13 +22,19 @@ public class PurchaseTransactionController {
 
   private final PurchaseTransactionService purchaseTransactionService;
 
-  @PostMapping("/purchase-transaction")
+  @PostMapping("/v1/purchase-transaction")
+  @Observed(name = "Request",
+      contextualName = "Store_Purchase_Transaction",
+      lowCardinalityKeyValues = {"endpoint", "/purchase-transaction"})
   public PurchaseTransactionResponse storePurchaseTransaction(
       @Valid @RequestBody PurchaseTransactionRequest purchaseTransactionRequest) {
     return purchaseTransactionService.store(purchaseTransactionRequest);
   }
 
-  @GetMapping("/purchase-transaction/{transactionId}")
+  @GetMapping("/v1/purchase-transaction/{transactionId}")
+  @Observed(name = "Request",
+      contextualName = "Retrieve_Purchase_Transaction",
+      lowCardinalityKeyValues = {"endpoint", "/purchase-transaction/{transactionId}"})
   public ConvertedTransactionResponse retrievePurchaseTransaction(
       @PathVariable UUID transactionId, @PathParam("country") @NotNull String currency) {
     return purchaseTransactionService.retrieveInCurrency(transactionId, currency);

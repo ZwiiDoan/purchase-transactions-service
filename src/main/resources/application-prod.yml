@@ -14,10 +14,16 @@ spring:
     enabled: false #TODO: run flyway migration in a separated CD pipeline
     out-of-order: false
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,metrics
+
 services:
   treasury:
     baseUrl: https://api.fiscaldata.treasury.gov/services/api/fiscal_service
 
 logging:
   level:
-    per.duyd: DEBUG
+    per.duyd: INFO

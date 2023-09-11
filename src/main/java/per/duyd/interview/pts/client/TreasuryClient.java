@@ -6,6 +6,7 @@ import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
+import io.micrometer.observation.annotation.Observed;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import per.duyd.interview.pts.advice.TrackDownstreamInvocation;
+import per.duyd.interview.pts.advice.TrackDownstreamCall;
 import per.duyd.interview.pts.dto.ExchangeRateDto;
 import per.duyd.interview.pts.dto.ExchangeRateResponse;
 
@@ -47,7 +48,10 @@ public class TreasuryClient {
   @RateLimiter(name = TREASURY_EXCHANGE_RATE_API_NAME)
   @Bulkhead(name = TREASURY_EXCHANGE_RATE_API_NAME)
   @Retry(name = TREASURY_EXCHANGE_RATE_API_NAME)
-  @TrackDownstreamInvocation(downstreamName = TREASURY_EXCHANGE_RATE_API_NAME, endpoint = "/v1/accounting/od/rates_of_exchange")
+  @TrackDownstreamCall(downstreamName = TREASURY_EXCHANGE_RATE_API_NAME, endpoint = "/v1/accounting/od/rates_of_exchange")
+  @Observed(name = "Downstream_Call",
+      contextualName = TREASURY_EXCHANGE_RATE_API_NAME,
+      lowCardinalityKeyValues = {"endpoint", "/v1/accounting/od/rates_of_exchange"})
   public @NotNull ExchangeRateDto getLatestExchangeRate(@NotNull String currency,
                                                         LocalDate transactionDate) {
     ResponseEntity<ExchangeRateResponse> responseEntity = treasuryRestTemplate.getForEntity(

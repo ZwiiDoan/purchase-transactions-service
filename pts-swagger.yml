@@ -3,7 +3,7 @@ info:
   title: Purchase Transaction Service - OpenAPI 3.0
   version: 1.0.0
 paths:
-  /purchase-transaction:
+  /v1/purchase-transaction:
     post:
       summary: Add a new purchase transaction
       description: Add a new purchase transaction
@@ -34,7 +34,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PurchaseTransactionErrorResponse'
-  /purchase-transaction/{transactionId}:
+  /v1/purchase-transaction/{transactionId}:
     get:
       summary: Find purchase transaction by ID
       description: Returns a single purchase transaction

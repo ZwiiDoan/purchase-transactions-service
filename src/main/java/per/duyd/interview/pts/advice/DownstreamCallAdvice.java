@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @Slf4j
-public class DownstreamInvocationAdvice {
+public class DownstreamCallAdvice {
   @Around("@annotation(trackDownstreamInvocation)")
-  public Object trackInvocation(
+  public Object trackDownstreamCall(
       ProceedingJoinPoint point,
-      TrackDownstreamInvocation trackDownstreamInvocation) throws Throwable {
+      TrackDownstreamCall trackDownstreamInvocation) throws Throwable {
     String downstreamName = trackDownstreamInvocation.downstreamName();
     String endpoint = trackDownstreamInvocation.endpoint();
     long starTime = System.currentTimeMillis();

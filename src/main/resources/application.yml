@@ -17,6 +17,21 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,env,metrics,configprops,mappings
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            request: true
+
 services:
   treasury:
     baseUrl: https://api.fiscaldata.treasury.gov/services/api/fiscal_service
@@ -30,7 +45,7 @@ application:
 
 logging:
   pattern:
-    level: "%5p [correlationId=%X{correlationId:-}]"
+    level: "%5p [correlationId=%X{correlationId:-},traceId=%X{traceId:-},spanId=%X{spanId:-}]"
   level:
     per.duyd: DEBUG
 
