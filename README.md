@@ -102,11 +102,11 @@ Execute from repo's root directory
 /.gradlew bootRun
 ```
 
-* In Demo environment ("default" profile) the application integrates with embedded/in-memory
-  H2 Database and connects to the
-  real [Treasury Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange)
+In Demo environment ("default" profile) the application integrates with embedded/in-memory
+H2 Database and connects to the
+real [Treasury Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange)
 
-* User can store a Purchase Transaction with this curl command
+User can store a Purchase Transaction with this curl command
 
 ```
 curl --location 'http://localhost:8080/v1/purchase-transaction' \
