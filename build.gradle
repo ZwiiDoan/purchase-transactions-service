@@ -33,6 +33,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation("org.apache.commons:commons-lang3:${commonLang3Version}")
     implementation 'org.flywaydb:flyway-core'
+    implementation("it.ozimov:embedded-redis:${embeddedRedisVersion}") {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'//conflict with Spring logback
+    }
+    implementation "com.google.guava:guava:${guavaVersion}"//fix embedded-redis CVE
+    implementation "commons-io:commons-io:${commonsIoVersion}"//fix embedded-redis CVE
     implementation "io.github.resilience4j:resilience4j-spring-boot3:${resilience4jVersion}"
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'

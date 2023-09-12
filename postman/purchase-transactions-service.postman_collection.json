@@ -1,0 +1,195 @@
+{
+	"info": {
+		"_postman_id": "f9eb872d-c51a-4627-9813-5fe9642eb067",
+		"name": "purchase-transactions-service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3846863"
+	},
+	"item": [
+		{
+			"name": "GET exchange rate by currency",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?fields=effective_date,exchange_rate,country_currency_desc&filter=country_currency_desc:eq:Australia-Dollar,effective_date:gte:2023-03-12,effective_date:lte:2023-06-30&sort=-effective_date&page[number]=1&page[size]=1",
+					"protocol": "https",
+					"host": [
+						"api",
+						"fiscaldata",
+						"treasury",
+						"gov"
+					],
+					"path": [
+						"services",
+						"api",
+						"fiscal_service",
+						"v1",
+						"accounting",
+						"od",
+						"rates_of_exchange"
+					],
+					"query": [
+						{
+							"key": "fields",
+							"value": "effective_date,exchange_rate,country_currency_desc"
+						},
+						{
+							"key": "filter",
+							"value": "country_currency_desc:eq:Australia-Dollar,effective_date:gte:2023-03-12,effective_date:lte:2023-06-30"
+						},
+						{
+							"key": "sort",
+							"value": "-effective_date"
+						},
+						{
+							"key": "page[number]",
+							"value": "1"
+						},
+						{
+							"key": "page[size]",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST purchase transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.globals.set(\"transactionId\", JSON.parse(responseBody).transactionId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.globals.set(\"uuid\", require('uuid').v4());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Correlation-Id",
+						"value": "{{uuid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"description\": \"test-description\",\r\n  \"transactionDate\": \"2023-09-01\",\r\n  \"purchaseAmount\": \"9999.45678\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/purchase-transaction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"purchase-transaction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET purchase transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Correlation-Id",
+						"value": "{{uuid}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/v1/purchase-transaction/{{transactionId}}?currency=Australia-Dollar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"purchase-transaction",
+						"{{transactionId}}"
+					],
+					"query": [
+						{
+							"key": "currency",
+							"value": "Australia-Dollar"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET actuator",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Correlation-Id",
+						"value": "{{uuid}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/actuator/prometheus",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"actuator",
+						"prometheus"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

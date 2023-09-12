@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -136,10 +137,12 @@ public class RetrievePurchaseTransactionIntegrationTest
   }
 
   private String getTreasuryExchangeRateUrl() {
-    return "/v1/accounting/od/rates_of_exchange"
-        + "?fields=effective_date,exchange_rate,country_currency_desc"
-        + "&filter=country_currency_desc:eq:Australia-Dollar,"
-        + "effective_date:gte:2023-03-01,effective_date:lte:2023-09-01&sort=-effective_date"
-        + "&page%5Bnumber%5D=1&page%5Bsize%5D=1";
+    return String.format("/v1/accounting/od/rates_of_exchange"
+            + "?fields=effective_date,exchange_rate,country_currency_desc"
+            + "&filter=country_currency_desc:eq:Australia-Dollar,"
+            + "effective_date:gte:%s,effective_date:lte:%s&sort=-effective_date",
+        TRANSACTION_DATE.minusMonths(6).format(DateTimeFormatter.ISO_LOCAL_DATE),
+        TRANSACTION_DATE.format(DateTimeFormatter.ISO_LOCAL_DATE)
+    ) + "&page%5Bnumber%5D=1&page%5Bsize%5D=1";
   }
 }

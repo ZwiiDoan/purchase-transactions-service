@@ -1,6 +1,7 @@
 package per.duyd.interview.pts.client;
 
 import static per.duyd.interview.pts.exception.DataNotFoundException.EXCHANGE_RATE_NOT_FOUND_EXCEPTION;
+import static per.duyd.interview.pts.util.DateTimeUtil.UTC_ZONE_ID;
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -66,9 +67,9 @@ public class TreasuryClient {
   }
 
   private String getLatestExchangeRateQuery(@NotNull String currency, LocalDate transactionDate) {
-    return String.format(LATEST_EXCHANGE_RATE_QUERY_TEMPLATE,
-        currency,
-        transactionDate.minusMonths(validMonths).format(DateTimeFormatter.ISO_LOCAL_DATE),
+    return String.format(LATEST_EXCHANGE_RATE_QUERY_TEMPLATE, currency,
+        LocalDate.now(UTC_ZONE_ID).minusMonths(validMonths)
+            .format(DateTimeFormatter.ISO_LOCAL_DATE),
         transactionDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
   }
 }

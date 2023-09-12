@@ -1,6 +1,7 @@
 package per.duyd.interview.pts.service;
 
 import static per.duyd.interview.pts.mapper.ExchangeRateMapper.fromExchangeRateDto;
+import static per.duyd.interview.pts.util.DateTimeUtil.UTC_ZONE_ID;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ public class CachingExchangeRateService {
   public ExchangeRate getExchangeRate(@NotNull String currency,
                                       @NotNull LocalDate transactionDate) {
     return exchangeRateRepository.findByCurrencyAndEffectiveDateBetween(currency,
-            transactionDate.minusMonths(validMonths), transactionDate)
+            LocalDate.now(UTC_ZONE_ID).minusMonths(validMonths), transactionDate)
         .stream().findFirst()
         .orElseGet(() -> getAndCacheExchangeRateFromApi(currency, transactionDate));
   }

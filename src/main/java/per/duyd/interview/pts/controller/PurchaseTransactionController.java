@@ -34,7 +34,7 @@ public class PurchaseTransactionController {
   @GetMapping("/v1/purchase-transaction/{transactionId}")
   @Observed(name = "Request",
       contextualName = "Retrieve_Purchase_Transaction",
-      lowCardinalityKeyValues = {"endpoint", "/purchase-transaction/{transactionId}"})
+      lowCardinalityKeyValues = {"endpoint", "/purchase**-transaction/{transactionId}"})
   public ConvertedTransactionResponse retrievePurchaseTransaction(
       @PathVariable UUID transactionId, @PathParam("country") @NotNull String currency) {
     return purchaseTransactionService.retrieveInCurrency(transactionId, currency);

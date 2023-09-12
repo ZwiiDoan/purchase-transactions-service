@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static per.duyd.interview.pts.util.DateTimeUtil.UTC_ZONE_ID;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -45,7 +46,8 @@ class TreasuryClientTest {
   @Test
   void shouldGetLatestExchangeNotOlderThan6Months() {
     //Given
-    LocalDate transactionDate = LocalDate.now();
+    LocalDate now = LocalDate.now(UTC_ZONE_ID);
+    LocalDate transactionDate = now.minusMonths(1);
     ExchangeRateDto expectedExchangeRateDto = ExchangeRateDto.builder().build();
     ExchangeRateResponse exchangeRateResponse = ExchangeRateResponse.builder()
         .exchangeRateDtos(List.of(expectedExchangeRateDto, ExchangeRateDto.builder().build(),
@@ -64,7 +66,7 @@ class TreasuryClientTest {
             + "exchange_rate,country_currency_desc&filter=country_currency_desc:eq:Country"
             + "-Currency,effective_date:gte:%s,effective_date:lte:%s"
             + "&sort=-effective_date&page[number]=1&page[size]=1",
-        transactionDate.minusMonths(6), transactionDate));
+        now.minusMonths(6), transactionDate));
   }
 
   @Test

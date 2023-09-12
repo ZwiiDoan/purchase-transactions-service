@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static per.duyd.interview.pts.mapper.PurchaseTransactionMapper.roundToNearestCent;
+import static per.duyd.interview.pts.util.DateTimeUtil.UTC_ZONE_ID;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -36,7 +37,7 @@ class PurchaseTransactionServiceTest {
   private PurchaseTransactionService purchaseTransactionService;
 
   private static final UUID TRANSACTION_ID = UUID.randomUUID();
-  private static final LocalDate TRANSACTION_DATE = LocalDate.now();
+  private static final LocalDate TRANSACTION_DATE = LocalDate.now(UTC_ZONE_ID);
   private static final String TEST_CURRENCY = "Country-Currency";
   private static final String TEST_DESCRIPTION = "Test-Description";
 

@@ -3,6 +3,7 @@ package per.duyd.interview.pts.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static per.duyd.interview.pts.util.DateTimeUtil.UTC_ZONE_ID;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,12 +34,12 @@ class CachingExchangeRateServiceTest {
   @Test
   void shouldGetApplicableExchangeRateFromDatabase() {
     //Given
-    LocalDate now = LocalDate.now();
+    LocalDate now = LocalDate.now(UTC_ZONE_ID);
     LocalDate transactionDate = now.minusMonths(1);
     ExchangeRate expectedExchangeRate =
         ExchangeRate.builder().effectiveDate(now.minusMonths(2)).build();
     when(exchangeRateRepository.findByCurrencyAndEffectiveDateBetween(TEST_CURRENCY,
-        transactionDate.minusMonths(6), transactionDate))
+        now.minusMonths(6), transactionDate))
         .thenReturn(List.of(expectedExchangeRate));
 
     //When & Then
@@ -49,12 +50,12 @@ class CachingExchangeRateServiceTest {
   @Test
   void shouldGetApplicableExchangeRateFromApiWhenItDoesNotExistInDatabase() {
     //When
-    LocalDate now = LocalDate.now();
+    LocalDate now = LocalDate.now(UTC_ZONE_ID);
     LocalDate recordDate = now.minusMonths(2);
     LocalDate transactionDate = now.minusMonths(1);
 
     when(exchangeRateRepository.findByCurrencyAndEffectiveDateBetween(TEST_CURRENCY,
-        transactionDate.minusMonths(6), transactionDate)).thenReturn(List.of());
+        now.minusMonths(6), transactionDate)).thenReturn(List.of());
     when(exchangeRateRepository.save(any(ExchangeRate.class))).thenAnswer(
         invocation -> invocation.getArguments()[0]);
 

@@ -47,19 +47,21 @@ satisfy:
 * Transaction date is required and must not be in future
 * Purchase amount is required and must be greater than 0
 
-The diagram below depicts solution for the 2nd endpoint "Retrieve a stored purchase transaction":
+The sequence diagram below depicts solution for the 2nd endpoint "Retrieve a stored purchase transaction":
 
 ![Purchase Tranasction Service - Solution.PNG](diagrams%2FPurchase%20Tranasction%20Service%20-%20Solution.PNG)
 
-* The endpoint requires a `Transaction Id` and `Currency` (`country_currency_desc` supported
+* The endpoint requires a `Transaction Id` and a `Currency` (`country_currency_desc` supported
   by [Treasury Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange))
-* The application will store the exchange rate fetched from the API into Database so that it
-  will not need to make the downstream call for every user request.
-* When sending requests to Treasury Reporting Rates of Exchange API, the application always asks for the
-  latest exchange rate that is not older than 6 months from the purchase date to satisfy Requirement #2. This is
-  achieved by using the API query
+* The application will cache exchange rates fetched from [Treasury
+  Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange)
+  so that it will not need to make the downstream call for every user request. Exchange rates are cached by "
+  country_currency_desc" and "effective_date" (as supported by
+  the [Treasury Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange)).
+* When sending requests to the API, the application always asks for the
+  latest exchange rate that is not older than 6 months from current date (UTC) and not older than purchase date to
+  satisfy Requirement #2. This is achieved by using the API query
   params: `&filter=country_currency_desc:eq:{Requested-Country-Currency},effective_date:gte:{Purchase-Date-6-Months-Ago},effective_date:lte:{Purchase-Date}&sort=-record_date&page[number]=1&page[size]=1`.
-  This approach minimises the implementation required and the amount of data needs to be transferred.
 * The application utilises [Resilience4j](https://resilience4j.readme.io/docs/getting-started-3) to implement best
   practice patterns when interacting with downstream services such as: circuit-breaker, rate-limiting (throttling),
   bulkhead and retry.
@@ -87,14 +89,14 @@ The build pipeline integrates different tools to verify code quality and securit
   and [Wiremock](https://wiremock.org/docs/junit-jupiter/) to stimulate the [Treasury
   Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange).
   In remote and production environments, these dependencies are expected to be production-grade systems such as AWS RDS
-  and the actual API. The application is also expected to be deployed as multiple Docker containers/computing instances
-  in a High Availability and Secured Infrastructure with production-grade systems such as AWS ECS/EKS exposing endpoints
-  via an API Gateway.
+  and the actual API. The application is also expected to be deployed as multiple Docker
+  containers/computing instances in a High Availability and Secured Infrastructure with production-grade systems such as
+  AWS ECS/EKS exposing endpoints via an API Gateway.
 * The application uses [Flyway](https://flywaydb.org/) to manage [DB migrations](src/main/resources/db/migration).
   Flyway is enabled at application start-up in local Development and Test environments but will be executed in a
   separated CD Pipeline in remote environments.
 
-### Demo
+### Local Run/Demo
 
 Execute from repo's root directory
 
@@ -102,11 +104,11 @@ Execute from repo's root directory
 /.gradlew bootRun
 ```
 
-In Demo environment ("default" profile) the application integrates with embedded/in-memory
-H2 Database and connects to the
+In Demo environment ("default" profile), the application integrates with embedded/in-memory H2 Database and connects to
+the
 real [Treasury Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange)
 
-User can store a Purchase Transaction with this curl command
+User can store a Purchase Transaction with this curl command:
 
 ```
 curl --location 'http://localhost:8080/v1/purchase-transaction' \
@@ -119,12 +121,14 @@ curl --location 'http://localhost:8080/v1/purchase-transaction' \
 }'
 ```
 
-Then retrieve the transaction using id in previous response and curl command
+Then retrieve the transaction using id in previous response and curl command:
 
 ```
 curl --location 'http://localhost:8080/v1/purchase-transaction/{transaction-id}?currency=Australia-Dollar' \
 --header 'Correlation-Id: 08ef44c8-5477-44d1-a61c-f0931abf37bf'
 ```
+
+You can also import the Postman collection in [postman](postman) folder to interact with the demo application.
 
 ### Future Improvements & Considerations
 
